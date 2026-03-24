@@ -2,57 +2,204 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fixie Shop KG</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gixedgear Shop</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        :root {
+            --bg-color: #0f0f0f;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-muted: #aaaaaa;
+            --accent: #f39c12; /* Золотой/Оранжевый */
+            --success: #2ecc71;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #1a1a1a;
-            color: white;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
+        }
+
+        header {
             padding: 20px;
-        }
-        h1 { text-align: center; color: #f39c12; font-size: 24px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-        .catalog { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .card {
-            background: #262626;
-            border-radius: 12px;
-            padding: 10px;
             text-align: center;
-            border: 1px solid #333;
+            background: linear-gradient(180deg, #1a1a1a 0%, var(--bg-color) 100%);
+            border-bottom: 1px solid #333;
         }
-        .card img { width: 100%; border-radius: 8px; margin-bottom: 10px; }
-        .card .title { font-weight: bold; font-size: 14px; height: 40px; overflow: hidden; }
-        .card .price { color: #2ecc71; margin: 10px 0; font-size: 16px; }
-        .btn {
-            background: #f39c12;
-            color: black;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
+
+        header h1 {
+            margin: 0;
+            font-size: 22px;
+            letter-spacing: 2px;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+
+        header p {
+            margin: 5px 0 0;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .container {
+            padding: 15px;
+        }
+
+        .catalog {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #2a2a2a;
+            transition: transform 0.2s;
+        }
+
+        .card:active {
+            transform: scale(0.97);
+        }
+
+        .card img {
             width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: #252525;
+        }
+
+        .card-content {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .item-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 34px;
+        }
+
+        .item-price {
+            font-size: 16px;
+            color: var(--success);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .buy-btn {
+            background-color: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        #loader {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
-    <h1>🚲 FIXIE SHOP KG</h1>
-    <div class="catalog" id="catalog">
-        <p style="grid-column: 1/3; text-align: center; color: #888;">Загрузка актуальных товаров...</p>
-    </div>
 
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть на весь экран
+<header>
+    <h1>FIXIE SHOP KG</h1>
+    <p>Premium Track Bikes & Parts</p>
+</header>
 
-        // Тестовая функция закрытия
-        function buyItem(name) {
-            tg.sendData("Купить: " + name);
-            tg.close();
+<div class="container">
+    <div id="loader">Загрузка товаров...</div>
+    <div class="catalog" id="catalog" style="display: none;"></div>
+</div>
+
+<script>
+    let tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.ready();
+
+    // Цвета темы из Telegram
+    document.body.style.backgroundColor = tg.themeParams.bg_color || '#0f0f0f';
+
+    // ДАННЫЕ (Пока вручную, позже заменим на fetch)
+    const items = [
+        {
+            id: 1,
+            title: "Aventon Mataro 2024 (Limited)",
+            price: "55 000 сом",
+            photo: "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=400"
+        },
+        {
+            id: 2,
+            title: "Frameset Tsunami SNM100",
+            price: "18 500 сом",
+            photo: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=400"
+        },
+        {
+            id: 3,
+            title: "Wheelset Miche Pistard",
+            price: "22 000 сом",
+            photo: "https://images.unsplash.com/photo-1532298229144-0ee0c57515c5?w=400"
+        },
+        {
+            id: 4,
+            title: "Saddle Specialized Power",
+            price: "8 400 сом",
+            photo: "https://images.unsplash.com/photo-1544191713-2945d8120e8b?w=400"
         }
-    </script>
+    ];
+
+    function renderItems() {
+        const container = document.getElementById('catalog');
+        const loader = document.getElementById('loader');
+        
+        container.innerHTML = '';
+        
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <img src="${item.photo}" alt="${item.title}">
+                <div class="card-content">
+                    <div class="item-title">${item.title}</div>
+                    <div class="item-price">${item.price}</div>
+                    <button class="buy-btn" onclick="order('${item.title}')">Заказать</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        loader.style.display = 'none';
+        container.style.display = 'grid';
+    }
+
+    function order(name) {
+        tg.sendData(`Order: ${name}`);
+        tg.close();
+    }
+
+    // Имитируем небольшую задержку загрузки
+    setTimeout(renderItems, 800);
+
+</script>
 </body>
 </html>
-
