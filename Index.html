@@ -3,48 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gixedgear Shop</title>
+    <title>Gixedgear Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* Основные цвета в стиле Fixie-культуры */
         :root {
-            --bg-color: #0f0f0f;
-            --card-bg: #1e1e1e;
-            --text-main: #ffffff;
-            --text-muted: #aaaaaa;
-            --accent: #f39c12; /* Золотой/Оранжевый */
-            --success: #2ecc71;
+            --bg: #0a0a0a;
+            --card: #161616;
+            --accent: #f39c12; /* Золото */
+            --text: #ffffff;
+            --muted: #888888;
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
             padding: 0;
-            -webkit-user-select: none;
+            overflow-x: hidden;
         }
 
-        header {
-            padding: 20px;
+        /* Шапка приложения */
+        .header {
+            padding: 25px 15px;
             text-align: center;
-            background: linear-gradient(180deg, #1a1a1a 0%, var(--bg-color) 100%);
-            border-bottom: 1px solid #333;
+            background: linear-gradient(to bottom, #1a1a1a, var(--bg));
+            border-bottom: 1px solid #222;
         }
 
-        header h1 {
+        .header h1 {
             margin: 0;
-            font-size: 22px;
-            letter-spacing: 2px;
-            color: var(--accent);
+            font-size: 24px;
             text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(243, 156, 18, 0.3);
         }
 
-        header p {
-            margin: 5px 0 0;
+        .header p {
+            margin: 8px 0 0;
             font-size: 12px;
-            color: var(--text-muted);
+            color: var(--muted);
+            font-weight: 300;
         }
 
+        /* Сетка товаров */
         .container {
             padding: 15px;
         }
@@ -55,150 +59,145 @@
             gap: 12px;
         }
 
+        /* Карточка товара */
         .card {
-            background: var(--card-bg);
-            border-radius: 15px;
+            background: var(--card);
+            border-radius: 16px;
+            border: 1px solid #252525;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            border: 1px solid #2a2a2a;
-            transition: transform 0.2s;
+            transition: transform 0.1s;
         }
 
         .card:active {
-            transform: scale(0.97);
+            transform: scale(0.96);
         }
 
         .card img {
             width: 100%;
-            height: 140px;
+            height: 150px;
             object-fit: cover;
-            background: #252525;
+            background-color: #222;
         }
 
-        .card-content {
-            padding: 10px;
+        .card-info {
+            padding: 12px;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            flex-grow: 1;
         }
 
-        .item-title {
+        .title {
             font-size: 14px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            height: 38px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            height: 34px;
         }
 
-        .item-price {
+        .price {
             font-size: 16px;
-            color: var(--success);
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 12px;
         }
 
+        /* Кнопка купить */
         .buy-btn {
-            background-color: var(--accent);
+            background: var(--accent);
             color: #000;
             border: none;
             padding: 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 12px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 11px;
             text-transform: uppercase;
             cursor: pointer;
+            width: 100%;
         }
 
         #loader {
             text-align: center;
-            padding: 50px;
-            color: var(--text-muted);
+            padding: 40px;
+            color: var(--muted);
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>FIXIE SHOP KG</h1>
-    <p>Premium Track Bikes & Parts</p>
-</header>
+<div class="header">
+    <h1>GIXEDGEAR KG</h1>
+    <p>МАГАЗИН ФИКСИРОВАННЫХ ВЕЛОСИПЕДОВ</p>
+</div>
 
 <div class="container">
-    <div id="loader">Загрузка товаров...</div>
-    <div class="catalog" id="catalog" style="display: none;"></div>
+    <div id="loader">Загрузка каталога...</div>
+    <div class="catalog" id="catalog"></div>
 </div>
 
 <script>
     let tg = window.Telegram.WebApp;
-    tg.expand();
+    tg.expand(); // Разворачиваем приложение
     tg.ready();
 
-    // Цвета темы из Telegram
-    document.body.style.backgroundColor = tg.themeParams.bg_color || '#0f0f0f';
-
-    // ДАННЫЕ (Пока вручную, позже заменим на fetch)
-    const items = [
+    // Тестовые данные (пока ты на Pydroid)
+    const mockItems = [
         {
-            id: 1,
-            title: "Aventon Mataro 2024 (Limited)",
-            price: "55 000 сом",
-            photo: "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=400"
+            title: "Tsunami SNM100 Black",
+            price: "19 500 сом",
+            photo: "https://images.unsplash.com/photo-1532298229144-0ee0c57515c5?w=500"
         },
         {
-            id: 2,
-            title: "Frameset Tsunami SNM100",
-            price: "18 500 сом",
-            photo: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=400"
+            title: "Aventon Mataro Raw",
+            price: "52 000 сом",
+            photo: "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=500"
         },
         {
-            id: 3,
-            title: "Wheelset Miche Pistard",
-            price: "22 000 сом",
-            photo: "https://images.unsplash.com/photo-1532298229144-0ee0c57515c5?w=400"
+            title: "Колеса Miche Pistard",
+            price: "24 000 сом",
+            photo: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=500"
         },
         {
-            id: 4,
-            title: "Saddle Specialized Power",
-            price: "8 400 сом",
-            photo: "https://images.unsplash.com/photo-1544191713-2945d8120e8b?w=400"
+            title: "Система Sram Omnium",
+            price: "18 000 сом",
+            photo: "https://images.unsplash.com/photo-1544191713-2945d8120e8b?w=500"
         }
     ];
 
-    function renderItems() {
+    function render() {
         const container = document.getElementById('catalog');
         const loader = document.getElementById('loader');
         
         container.innerHTML = '';
         
-        items.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <img src="${item.photo}" alt="${item.title}">
-                <div class="card-content">
-                    <div class="item-title">${item.title}</div>
-                    <div class="item-price">${item.price}</div>
-                    <button class="buy-btn" onclick="order('${item.title}')">Заказать</button>
+        mockItems.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'card';
+            el.innerHTML = `
+                <img src="${item.photo}" alt="">
+                <div class="card-info">
+                    <div class="title">${item.title}</div>
+                    <div class="price">${item.price}</div>
+                    <button class="buy-btn" onclick="sendOrder('${item.title}')">🛒 Заказать</button>
                 </div>
             `;
-            container.appendChild(card);
+            container.appendChild(el);
         });
 
         loader.style.display = 'none';
-        container.style.display = 'grid';
     }
 
-    function order(name) {
-        tg.sendData(`Order: ${name}`);
-        tg.close();
+    function sendOrder(name) {
+        tg.sendData("Хочу купить: " + name);
+        tg.close(); // Закрыть Mini App после заказа
     }
 
-    // Имитируем небольшую задержку загрузки
-    setTimeout(renderItems, 800);
+    // Имитация загрузки
+    setTimeout(render, 500);
 
 </script>
 </body>
