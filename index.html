@@ -26,6 +26,23 @@
         <div id="loader" style="text-align:center; padding:40px; color:var(--muted);">Загрузка товаров...</div>
         <div class="catalog" id="catalog"></div>
     </div>
+    items.forEach(item => {
+        // Проверяем, есть ли фото и начинается ли оно с http
+        const photoUrl = (item.photo && item.photo.includes('http')) 
+                         ? item.photo 
+                         : 'https://via.placeholder.com/400x300?text=FIXIE+SHOP';
+
+        container.innerHTML += `
+            <div class="card">
+                <img src="${photoUrl}" alt="">
+                <div class="card-info">
+                    <div class="title">${item.title}</div>
+                    <div class="price">${item.price}</div>
+                    <button class="buy-btn" onclick="order('${item.title}')">ЗАКАЗАТЬ</button>
+                </div>
+            </div>`;
+    });
+
 
 <script>
     let tg = window.Telegram.WebApp;
