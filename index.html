@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gixedgear Shop</title>
+    <title>GIXEDGEAR KG</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --bg: #0a0a0a; --card: #161616; --accent: #f39c12; --text: #ffffff; --muted: #888; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
-        .header { padding: 20px; text-align: center; border-bottom: 1px solid #222; }
-        .header h1 { margin: 0; font-size: 20px; color: var(--accent); letter-spacing: 2px; }
+        .header { padding: 25px 15px; text-align: center; border-bottom: 1px solid #222; }
+        .header h1 { margin: 0; font-size: 22px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
         .container { padding: 15px; }
-        .catalog { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; display: flex; flex-direction: column; }
-        .card img { width: 100%; height: 130px; object-fit: cover; }
-        .card-info { padding: 10px; flex-grow: 1; }
-        .title { font-size: 13px; font-weight: 600; height: 32px; overflow: hidden; margin-bottom: 5px; }
-        .price { font-size: 15px; color: var(--accent); font-weight: bold; margin-bottom: 10px; }
-        .buy-btn { background: var(--accent); color: #000; border: none; width: 100%; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; }
+        .catalog { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .card { background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid #222; display: flex; flex-direction: column; }
+        .card img { width: 100%; height: 140px; object-fit: cover; background: #222; }
+        .card-info { padding: 12px; flex-grow: 1; }
+        .title { font-size: 14px; font-weight: 600; height: 36px; overflow: hidden; margin-bottom: 8px; }
+        .price { font-size: 16px; color: var(--accent); font-weight: 800; margin-bottom: 12px; }
+        .buy-btn { background: var(--accent); color: #000; border: none; width: 100%; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 11px; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="header"><h1>GIXEDGEAR KG</h1></div>
     <div class="container">
-        <div id="loader" style="text-align:center; padding:20px; color:var(--muted);">Загрузка...</div>
+        <div id="loader" style="text-align:center; padding:40px; color:var(--muted);">Загрузка товаров...</div>
         <div class="catalog" id="catalog"></div>
     </div>
 
@@ -31,41 +31,42 @@
     let tg = window.Telegram.WebApp;
     tg.expand();
 
-    async function loadData() {
+    async function loadItems() {
         const container = document.getElementById('catalog');
+        const loader = document.getElementById('loader');
         try {
-            // Пытаемся загрузить твои реальные товары
-            const resp = await fetch('data.json?v=' + Math.random());
-            const items = await resp.json();
-            render(items);
-        } catch (e) {
-            // Если файла нет, показываем пустую витрину
-            document.getElementById('loader').innerText = "Товары скоро появятся...";
-        }
-    }
+            // Загружаем файл, который создал бот в Pydroid
+            const response = await fetch('data.json?v=' + Date.now());
+            const items = await response.json();
+            
+            if (items.length === 0) {
+                loader.innerText = "В магазине пока пусто...";
+                return;
+            }
 
-    function render(items) {
-        const container = document.getElementById('catalog');
-        container.innerHTML = '';
-        items.forEach(item => {
-            container.innerHTML += `
-                <div class="card">
-                    <img src="${item.photo || ''}" onerror="this.src='https://via.placeholder.com/150?text=No+Photo'">
-                    <div class="card-info">
-                        <div class="title">${item.title}</div>
-                        <div class="price">${item.price} сом</div>
-                        <button class="buy-btn" onclick="order('${item.title}')">ЗАКАЗАТЬ</button>
-                    </div>
-                </div>`;
-        });
-        document.getElementById('loader').style.display = 'none';
+            container.innerHTML = '';
+            items.forEach(item => {
+                container.innerHTML += `
+                    <div class="card">
+                        <img src="${item.photo || ''}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Photo'">
+                        <div class="card-info">
+                            <div class="title">${item.title}</div>
+                            <div class="price">${item.price}</div>
+                            <button class="buy-btn" onclick="order('${item.title}')">ЗАКАЗАТЬ</button>
+                        </div>
+                    </div>`;
+            });
+            loader.style.display = 'none';
+        } catch (e) {
+            loader.innerText = "Ошибка загрузки данных. Убедитесь, что файл data.json загружен на GitHub.";
+        }
     }
 
     function order(name) {
         tg.sendData("Заказ: " + name);
         tg.close();
     }
-    loadData();
+    loadItems();
 </script>
 </body>
 </html>
